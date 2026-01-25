@@ -14,7 +14,7 @@ apt install -y nodejs npm git
 cd /opt || exit 1
 
 if [ ! -d "bma-simulator-feuerwehr" ]; then
-  git clone https://github.com/DEIN_GITHUB_USER/bma-simulator-feuerwehr.git
+  git clone https://github.com/yodaeichen/bma-simulator-feuerwehr.git
 fi
 
 cd bma-simulator-feuerwehr || exit 1
