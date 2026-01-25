@@ -3,13 +3,13 @@
 ## 🚀 One-Line-Installation (Raspberry Pi / Linux)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/DEIN_GITHUB_USER/bma-simulator-feuerwehr/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/yodaeichen/bma-simulator-feuerwehr/main/install.sh | sudo bash
 ```
 
 ## 🔧 Manuelle Installation
 
 ```bash
-git clone https://github.com/DEIN_GITHUB_USER/bma-simulator-feuerwehr.git
+git clone https://github.com/yodaeichen/bma-simulator-feuerwehr.git
 cd bma-simulator-feuerwehr
 npm install
 npm start
