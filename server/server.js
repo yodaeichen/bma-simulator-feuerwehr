@@ -1,47 +1,66 @@
-const fs = require("fs");
-const path = require("path");
-
-const objectsPath = path.join(__dirname, "data", "objects.js");
-let objects = JSON.parse(fs.readFileSync(objectsPath));
-
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
 const PORT = 3000;
 
-let status = "NORMAL";
-let fat = [];
+/* -------------------------------------------------
+   STATIC FILES
+------------------------------------------------- */
+app.use(express.static(path.join(__dirname, "public")));
 
-function broadcast() {
-  io.emit("update", { status, fat });
+/* -------------------------------------------------
+   ROUTES FOR VIEWS
+------------------------------------------------- */
+app.get("/bmz", (req, res) =>
+  res.sendFile(path.join(__dirname, "public", "bmz.html"))
+);
+
+app.get("/fat", (req, res) =>
+  res.sendFile(path.join(__dirname, "public", "fat.html"))
+);
+
+app.get("/fbf", (req, res) =>
+  res.sendFile(path.join(__dirname, "public", "fbf.html"))
+);
+
+app.get("/instructor", (req, res) =>
+  res.sendFile(path.join(__dirname, "public", "instructor.html"))
+);
+
+/* -------------------------------------------------
+   OBJECT DATA (robust loading)
+------------------------------------------------- */
+const objectsPath = path.join(__dirname, "data", "objects.json");
+let objects = {};
+
+if (fs.existsSync(objectsPath)) {
+  try {
+    objects = JSON.parse(fs.readFileSync(objectsPath));
+    console.log("✅ Objektdaten geladen");
+  } catch (e) {
+    console.error("❌ Fehler in objects.json", e);
+  }
+} else {
+  console.warn("⚠️ objects.json fehlt – leere Objektliste");
 }
 
-app.use(express.static(path.join(__dirname, "public")));
-app.get("/bmz", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "bmz.html"));
-});
-
-app.get("/fbf", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "fbf.html"));
-});
-
-app.get("/fat", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "fat.html"));
-});
-
-app.get("/instructor", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "instructor.html"));
-});
+/* -------------------------------------------------
+   API
+------------------------------------------------- */
 app.get("/api/objects", (req, res) => {
   res.json(objects);
 });
 
-app.get("/objects.json", (req, res) => res.json(objects));
-
+/* -------------------------------------------------
+   LAUFKARTEN (PDF)
+------------------------------------------------- */
 app.get("/laufkarte/:object/:floor/:detector", (req, res) => {
   const { object, floor, detector } = req.params;
 
@@ -60,53 +79,53 @@ app.get("/laufkarte/:object/:floor/:detector", (req, res) => {
   res.sendFile(file);
 });
 
+/* -------------------------------------------------
+   BMA STATE
+------------------------------------------------- */
+let bmaState = {
+  status: "NORMAL", // NORMAL | ALARM | STOERUNG
+  fat: []
+};
+
+/* -------------------------------------------------
+   SOCKET.IO
+------------------------------------------------- */
 io.on("connection", socket => {
-  socket.emit("update", { status, fat });
+  console.log("🔌 Client verbunden");
 
-  socket.on("alarm", data => {
-    const object = objects[data.objectId];
-    const floor = object?.floors[data.floorId];
-    const detector = floor?.detectors[data.detectorId];
-    if (!detector) return;
+  // Initialstatus senden
+  socket.emit("update", bmaState);
 
-    status = "ALARM";
+  /* ---------- ALARM ---------- */
+  socket.on("alarm", alarm => {
+    console.log("🔥 Alarm", alarm);
 
-    const filename = `${object.id}-${data.floorId}-${data.detectorId}.pdf`;
-    const outPath = path.join(__dirname, "laufkarten/output", filename);
+    bmaState.status = "ALARM";
 
-    createLaufkarte({
-      object: object.name,
-      address: object.address,
-      floor: floor.name,
-      detector: `${data.detectorId} – ${detector.name}`,
-      type: detector.type,
-      route: detector.route
-    }, outPath);
-  fat.push({
-  time: new Date().toLocaleTimeString(),
-  object: alarm.objectId,
-  floor: alarm.floorId,
-  detector: alarm.detectorId
-});
-
-    fat.unshift({
-      time: new Date().toLocaleTimeString("de-DE"),
-      object: object.name,
-      floor: floor.name,
-      detector: detector.name,
-      laufkarte: filename
+    bmaState.fat.unshift({
+      time: new Date().toLocaleTimeString(),
+      object: alarm.objectId,
+      floor: alarm.floorId,
+      detector: alarm.detectorId
     });
 
-    broadcast();
+    io.emit("update", bmaState);
   });
 
+  /* ---------- RESET ---------- */
   socket.on("reset", () => {
-    status = "NORMAL";
-    fat = [];
-    broadcast();
+    console.log("🔄 Rückstellung");
+
+    bmaState.status = "NORMAL";
+    bmaState.fat = [];
+
+    io.emit("update", bmaState);
   });
 });
 
-server.listen(PORT, () =>
-  console.log("BMA Simulator läuft auf Port", PORT)
-);
+/* -------------------------------------------------
+   START SERVER
+------------------------------------------------- */
+server.listen(PORT, () => {
+  console.log(`🚒 BMA Simulator läuft auf Port ${PORT}`);
+});
