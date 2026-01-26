@@ -20,6 +20,21 @@ function broadcast() {
 }
 
 app.use(express.static(path.join(__dirname, "public")));
+app.get("/bmz", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "bmz.html"));
+});
+
+app.get("/fbf", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "fbf.html"));
+});
+
+app.get("/fat", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "fat.html"));
+});
+
+app.get("/instructor", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "instructor.html"));
+});
 
 app.get("/objects.json", (req, res) => res.json(objects));
 
