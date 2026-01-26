@@ -38,6 +38,9 @@ app.get("/fat", (req, res) => {
 app.get("/instructor", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "instructor.html"));
 });
+app.get("/api/objects", (req, res) => {
+  res.json(objects);
+});
 
 app.get("/objects.json", (req, res) => res.json(objects));
 
