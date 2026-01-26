@@ -25,7 +25,7 @@ echo "📁 Installation nach /opt"
 cd /opt
 
 if [ ! -d "bma-simulator-feuerwehr" ]; then
-  git clone https://github.com/DEIN_GITHUB_USER/bma-simulator-feuerwehr.git
+  git clone https://github.com/yodaeichen/bma-simulator-feuerwehr.git
 else
   echo "ℹ Repository existiert bereits"
 fi
@@ -37,7 +37,7 @@ npm install
 
 echo "⚙️ systemd Service erstellen"
 
-cat << 'EOF' > /etc/systemd/system/bma-simulator.service
+cat << 'EOF' > /etc/systemd/bma-simulator.service
 [Unit]
 Description=BMA Simulator Feuerwehr
 After=network.target
