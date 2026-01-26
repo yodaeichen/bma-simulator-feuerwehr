@@ -37,7 +37,7 @@ npm install
 
 echo "⚙️ systemd Service erstellen"
 
-cat << 'EOF' > /etc/systemd/bma-simulator.service
+cat << 'EOF' > /etc/systemd/system/bma-simulator.service
 [Unit]
 Description=BMA Simulator Feuerwehr
 After=network.target
