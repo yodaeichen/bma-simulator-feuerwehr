@@ -75,6 +75,12 @@ io.on("connection", socket => {
       type: detector.type,
       route: detector.route
     }, outPath);
+  fat.push({
+  time: new Date().toLocaleTimeString(),
+  object: alarm.objectId,
+  floor: alarm.floorId,
+  detector: alarm.detectorId
+});
 
     fat.unshift({
       time: new Date().toLocaleTimeString("de-DE"),
