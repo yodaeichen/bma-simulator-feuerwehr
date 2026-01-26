@@ -4,9 +4,6 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 
-const objects = require("./data/objects");
-const createLaufkarte = require("./laufkarten/templates/din-laufkarte");
-
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -38,10 +35,22 @@ app.get("/instructor", (req, res) => {
 
 app.get("/objects.json", (req, res) => res.json(objects));
 
-app.get("/laufkarte/:file", (req, res) => {
-  const file = path.join(__dirname, "laufkarten/output", req.params.file);
-  if (fs.existsSync(file)) res.sendFile(file);
-  else res.status(404).send("Laufkarte nicht vorhanden");
+app.get("/laufkarte/:object/:floor/:detector", (req, res) => {
+  const { object, floor, detector } = req.params;
+
+  const file = path.join(
+    __dirname,
+    "laufkarten",
+    object,
+    floor,
+    `${detector}.pdf`
+  );
+
+  if (!fs.existsSync(file)) {
+    return res.status(404).send("Laufkarte nicht gefunden");
+  }
+
+  res.sendFile(file);
 });
 
 io.on("connection", socket => {
