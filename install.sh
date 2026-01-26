@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🚒 BMA Simulator Feuerwehr – Installation (Node.js 22)"
+echo "🚒 BMA Simulator Feuerwehr – Installation (Node.js 22 + systemd)"
 
 # Root prüfen
 if [ "$EUID" -ne 0 ]; then
@@ -9,7 +9,7 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-echo "📦 System aktualisieren"
+echo "📦 System vorbereiten"
 apt update
 apt install -y curl git ca-certificates
 
@@ -17,27 +17,38 @@ echo "🟢 Installiere Node.js 22 (NodeSource)"
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt install -y nodejs
 
-echo "🔎 Versionen prüfen"
-echo "Node: $(node -v)"
-echo "NPM : $(npm -v)"
+echo "🔎 Versionen:"
+node -v
+npm -v
 
 echo "📁 Installation nach /opt"
-cd /opt || exit 1
+cd /opt
 
 if [ ! -d "bma-simulator-feuerwehr" ]; then
-  echo "📥 Repository klonen"
-  git clone https://github.com/yodaeichen/bma-simulator-feuerwehr.git
+  git clone https://github.com/DEIN_GITHUB_USER/bma-simulator-feuerwehr.git
 else
-  echo "🔄 Repository existiert bereits"
+  echo "ℹ Repository existiert bereits"
 fi
 
-cd bma-simulator-feuerwehr || exit 1
+cd bma-simulator-feuerwehr
 
 echo "📦 npm install"
 npm install
 
-echo "✅ Installation abgeschlossen"
+echo "⚙️ systemd Service installieren"
+cp systemd/bma-simulator.service /etc/systemd/system/bma-simulator.service
+
+systemctl daemon-reexec
+systemctl daemon-reload
+systemctl enable bma-simulator.service
+systemctl start bma-simulator.service
+
 echo
-echo "▶ Start:"
-echo "   cd /opt/bma-simulator-feuerwehr"
-echo "   npm start"
+echo "✅ Installation abgeschlossen"
+echo "🚒 BMA Simulator läuft jetzt als Dienst"
+echo
+echo "🔎 Status:"
+systemctl status bma-simulator.service --no-pager
+echo
+echo "🌐 Aufruf:"
+echo "   http://<PI-IP>:3000/bmz"
