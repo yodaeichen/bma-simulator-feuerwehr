@@ -1,12 +1,17 @@
 const socket = io();
 let objects = {};
 
-fetch("/objects.json")
+fetch("/api/objects")
   .then(r => r.json())
   .then(data => {
     objects = data;
     init();
+  })
+  .catch(err => {
+    alert("Objektdaten konnten nicht geladen werden");
+    console.error(err);
   });
+
 
 function init() {
   const o = document.getElementById("object");
