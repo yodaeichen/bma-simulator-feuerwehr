@@ -4,8 +4,6 @@ const path = require("path");
 const objectsPath = path.join(__dirname, "data", "objects.json");
 let objects = JSON.parse(fs.readFileSync(objectsPath));
 
-const path = require("path");
-const fs = require("fs");
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
