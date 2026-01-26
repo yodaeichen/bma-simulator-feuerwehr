@@ -1,1 +1,26 @@
-<html><body><h1>Instructor</h1></body></html>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Instructor</title>
+<style>
+  body { background:#111; color:white; font-family:Arial; padding:20px }
+  select,button { width:100%; padding:10px; margin:10px 0 }
+  button { font-weight:bold }
+</style>
+</head>
+<body>
+
+<h1>Instructor</h1>
+
+<select id="object"></select>
+<select id="floor"></select>
+<select id="detector"></select>
+
+<button onclick="alarm()">🔥 Alarm auslösen</button>
+<button onclick="reset()">🔄 Rückstellung</button>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/instructor.js"></script>
+</body>
+</html>
