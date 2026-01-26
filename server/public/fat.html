@@ -22,14 +22,29 @@ const list = document.getElementById("list");
 
 socket.on("update", data => {
   list.innerHTML = "";
-  data.fat.forEach(e => {
+
+  data.fat.forEach(entry => {
     const div = document.createElement("div");
+
+    div.style.cursor = "pointer";
+    div.style.padding = "5px";
+    div.style.borderBottom = "1px solid #400";
+
     div.textContent =
-      `${e.time} | ${e.object} | ${e.floor} | ${e.detector}`;
+      `${entry.time} | ${entry.object} | ${entry.floor} | ${entry.detector}`;
+
+    div.onclick = () => {
+      window.open(
+        `/laufkarte/${entry.object}/${entry.floor}/${entry.detector}`,
+        "_blank"
+      );
+    };
+
     list.appendChild(div);
   });
 });
 </script>
+
 
 </body>
 </html>
