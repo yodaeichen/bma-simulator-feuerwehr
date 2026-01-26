@@ -35,17 +35,37 @@ cd bma-simulator-feuerwehr
 echo "📦 npm install"
 npm install
 
-echo "⚙️ systemd Service installieren"
-cp systemd/bma-simulator.service /etc/systemd/system/bma-simulator.service
+echo "⚙️ systemd Service erstellen"
 
+cat << 'EOF' > /etc/systemd/system/bma-simulator.service
+[Unit]
+Description=BMA Simulator Feuerwehr
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/bma-simulator-feuerwehr
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=5
+User=root
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+echo "🔄 systemd neu laden"
 systemctl daemon-reexec
 systemctl daemon-reload
+
+echo "🚀 Autostart aktivieren & Dienst starten"
 systemctl enable bma-simulator.service
-systemctl start bma-simulator.service
+systemctl restart bma-simulator.service
 
 echo
 echo "✅ Installation abgeschlossen"
-echo "🚒 BMA Simulator läuft jetzt als Dienst"
+echo "🚒 BMA Simulator läuft jetzt als systemd-Dienst"
 echo
 echo "🔎 Status:"
 systemctl status bma-simulator.service --no-pager
