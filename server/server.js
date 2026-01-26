@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const objectsPath = path.join(__dirname, "data", "objects.json");
+const objectsPath = path.join(__dirname, "data", "objects.js");
 let objects = JSON.parse(fs.readFileSync(objectsPath));
 
 const express = require("express");
