@@ -19,6 +19,31 @@
 
 <button onclick="alarm()">🔥 Alarm auslösen</button>
 <button onclick="reset()">🔄 Rückstellung</button>
+  
+<script>
+  const socket = io();
+  const PIN = "14661";
+
+  function login() {
+    if (document.getElementById("pin").value === PIN) {
+      document.getElementById("login").style.display = "none";
+      document.getElementById("panel").style.display = "block";
+    } else {
+      alert("Falscher PIN");
+    }
+  }
+
+  function alarm() {
+    const floor = prompt("Etage (z.B. EG, OG1)", "EG");
+    const detector = prompt("Melder (z.B. Rauchmelder Flur)", "Rauchmelder");
+
+    socket.emit("alarm", { floor, detector });
+  }
+
+  function reset() {
+    socket.emit("reset");
+  }
+</script>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/instructor.js"></script>
