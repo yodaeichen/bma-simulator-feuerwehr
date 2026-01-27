@@ -1,50 +1,75 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>FAT</title>
-<style>
-  body { background:#000; color:#0f0; font-family:monospace; }
-  .fat { width:90%; margin:20px auto; border:4px solid red; padding:10px; }
-</style>
+  <meta charset="UTF-8">
+  <title>BMZ / FAT</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: green;
+      color: white;
+      text-align: center;
+    }
+    #bmz {
+      font-size: 2.5rem;
+      margin: 1rem;
+    }
+    #fat {
+      background: rgba(0,0,0,0.6);
+      margin: 1rem auto;
+      padding: 1rem;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 10px;
+      text-align: left;
+    }
+    #fat h2 {
+      text-align: center;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      padding: 0.5rem;
+      border-bottom: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
 
-<div class="fat">
-  <h2>Feuerwehr-Anzeige-Tableau</h2>
-  <div id="list"></div>
+<h1 id="bmz">Betrieb</h1>
+
+<div id="fat">
+  <h2>📋 Feuerwehr-Anzeigetableau (FAT)</h2>
+  <ul id="fatList"></ul>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-const socket = io();
-const list = document.getElementById("list");
+  const socket = io();
+  const bmz = document.getElementById("bmz");
+  const fatList = document.getElementById("fatList");
 
-socket.on("update", data => {
-  list.innerHTML = "";
+  socket.on("update", data => {
+    // BMZ-Status
+    if (data.status === "ALARM") {
+      bmz.innerText = "🔥 ALARM";
+      document.body.style.background = "red";
+    } else {
+      bmz.innerText = "Betrieb";
+      document.body.style.background = "green";
+    }
 
-  data.fat.forEach(entry => {
-    const div = document.createElement("div");
-
-    div.style.cursor = "pointer";
-    div.style.padding = "5px";
-    div.style.borderBottom = "1px solid #400";
-
-    div.textContent =
-      `${entry.time} | ${entry.object} | ${entry.floor} | ${entry.detector}`;
-
-    div.onclick = () => {
-      window.open(
-        `/laufkarte/${entry.object}/${entry.floor}/${entry.detector}`,
-        "_blank"
-      );
-    };
-
-    list.appendChild(div);
+    // FAT-Liste
+    fatList.innerHTML = "";
+    data.fat.forEach(entry => {
+      const li = document.createElement("li");
+      li.innerText = `${entry.time} – ${entry.floor} – ${entry.detector}`;
+      fatList.appendChild(li);
+    });
   });
-});
 </script>
-
 
 </body>
 </html>
